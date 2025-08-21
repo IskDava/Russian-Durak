@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CardsSpawn : MonoBehaviour
 {
-    public void RenderCards(List<Card> cards, GameObject cardPrefab)
+    public void RenderCards(List<Card> cards, GameObject cardPrefab, GameObject opponentCardPrefab)
     {
         int i;
         for (i = 0; i < transform.childCount && i < cards.Count; i++)
@@ -30,7 +30,7 @@ public class CardsSpawn : MonoBehaviour
             int j;
             for (j = 0;j < cards.Count - i; j++)
             {
-                GameObject newcard = Instantiate(cardPrefab, transform);
+                GameObject newcard = Instantiate(transform.name == "OpponentCards" ? opponentCardPrefab: cardPrefab, transform); 
 
                 newcard.name = $"Card ({j})";
 
@@ -41,10 +41,14 @@ public class CardsSpawn : MonoBehaviour
 
                     newcard.transform.localPosition = new Vector3((float)(lastCardPos.x + 2), 0, (float)(lastCardPos.z - 0.1));
                 }
-                newcard.transform.localScale = new Vector3(1f, 1f, 1f);
+                newcard.transform.localScale = Vector3.one;
 
                 Sprite cardSprite = Resources.Load<Sprite>($"cards/{cards[j].filename}");
                 newcard.GetComponent<SpriteRenderer>().sprite = cardSprite;
+
+                newcard.GetComponent<BoxCollider2D>().size = new Vector2(2.4f * newcard.transform.localScale.x,
+                                                                        3.36f * newcard.transform.localScale.y);
+                newcard.GetComponent<CardBehaivour>().card = cards[j];
             }
             Vector3 prev = transform.localPosition;
             float error = 1f;

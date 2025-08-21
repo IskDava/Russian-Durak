@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class Table : MonoBehaviour
 {
@@ -46,6 +47,10 @@ public class Table : MonoBehaviour
 
         Logs(deck, Player.players);
     }
+    private void Start()
+    {
+        Player.offensePlayer = Player.players[0];
+    }
     private void Logs(List<Card> deck, List<Player> players)
     {
         string s = "Bank's cards:\n";
@@ -66,12 +71,14 @@ public class Card
     public readonly string name, suit, filename;
     public readonly int priority;
     public bool isTrump;
-    public Card(string name, string suit, int priority)
+    public Player owner;
+    public Card(string name, string suit, int priority, Player owner = null)
     {
         this.name = name;
         this.suit = suit;
         this.priority = priority;
         filename = ((priority != 10) ? name[..1].ToUpper() : "T") + suit[..1].ToUpper();
+        this.owner = owner;
     }
     public static void SetTrumps()
     {
@@ -106,16 +113,19 @@ public class Card
 public class Player
 {
     public static List<Player> players = new();
-    public readonly List<Card> cards;
+    public readonly List<Card> cards = new();
+    public static Player offensePlayer;
+    private static int moveCount = 0;
     public readonly int ID;
     public Player(List<Card> cards)
     {
-        this.cards = cards;
+        Add(cards);
         ID = players.Count;
         players.Add(this);
     }
     public void Add(Card card) { 
         cards.Add(card);
+        card.owner = this;
     }
     public void Add(List<Card> cards)
     {
@@ -127,6 +137,11 @@ public class Player
     public void Remove(Card card)
     {
         cards.Remove(card);
+    }
+    public void PassMove()
+    {
+        if (this == offensePlayer) offensePlayer = players[moveCount++];
+        else Debug.LogError("This player can't pass, because it isn't his move");
     }
     public override string ToString()
     {

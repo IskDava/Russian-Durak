@@ -1,2 +1,3 @@
 # Russian-Durak
-Russian card game.
+
+Russian/Soviet card game. Rules are 
